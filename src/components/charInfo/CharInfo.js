@@ -56,10 +56,10 @@ const CharInfo = (props) => {
 
 
 
-    // const skeleton = char || loading || error ? null : <Skeleton/>
-    // const errorMessage = error ? <ErrorMessage/> : null;
-    // const spinner = loading ? <Spinner/> : null;
-    // const content = !loading && !error && char ? <View char={char}/> : null;
+    const skeleton = char || loading || error ? null : <Skeleton/>
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !loading && !error && char ? <View char={char}/> : null;
 
     return (
         <div className="char__info">

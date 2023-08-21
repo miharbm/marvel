@@ -1,13 +1,14 @@
 import './charList.scss';
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import CharListItem from "../charListItem/CharListItem";
 import useMarvelService from "../../services/MarvelService";
-import ErrorMessage from "../errorMessage/errorMessage";
-import Spinner from "../spinner/Spinner";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
+import {setListContent} from "../../utils/setContent";
+
+
 
 const CharList = (props) => {
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
 
     const [characters, setCharacters] = useState([])
     const [loadingNewItem, setLoadingNewItem] = useState(false)
@@ -19,12 +20,10 @@ const CharList = (props) => {
 
     useEffect(() => {
         onRequest(offset, true)
-        // getCharacters();
     }, []);
 
 
     const onRequest = (offset, initial) => {
-
         setLoadingNewItem(!initial);
         getCharacters(offset);
     }
@@ -36,11 +35,13 @@ const CharList = (props) => {
         setLoadingNewItem(false);
         setOffset(oldOffset => oldOffset + characters.length)
         setCharEnded(ended);
+
     }
 
     const getCharacters = (offset) => {
         getAllCharacters(offset)
             .then(onCharactersLoaded)
+            .then(() => setProcess("confirmed"))
     }
 
     const focusOnItem = id => {
@@ -81,15 +82,13 @@ const CharList = (props) => {
         )
     }
 
-
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !loadingNewItem ? <Spinner/> : null;
+    const elements = useMemo(() => {
+        return setListContent(process, () => renderCharacters(), loadingNewItem)
+    }, [process])
 
     return (
         <div className="char__list">
-            {errorMessage}
-            {spinner}
-            {renderCharacters()}
+            {elements}
             <button
                 className="button button__main button__long"
                 disabled={loadingNewItem}

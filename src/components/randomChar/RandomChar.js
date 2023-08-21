@@ -1,13 +1,12 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import React, {useEffect, useState} from "react";
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/errorMessage";
 import useMarvelService from "../../services/MarvelService";
+import {setContent} from "../../utils/setContent";
 
 const RandomChar = () => {
 
-    const {loading, error, getCharacterById, clearError} = useMarvelService();
+    const {process, setProcess, getCharacterById, clearError} = useMarvelService();
 
     const [char, setChar] = useState({
         name: null,
@@ -34,18 +33,13 @@ const RandomChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         getCharacterById(id)
             .then(onCharacterLoaded)
+            .then(() => setProcess("confirmed"))
     }
 
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? <View char={char} maxLengthDescr={220}/> : null;
-
     return (
         <div className="randomchar">
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, View, char, {maxLengthDescr : 220})}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>
@@ -63,9 +57,10 @@ const RandomChar = () => {
     )
 }
 
-const View = ({char}, maxLengthDescr = 220) => {
-    const {name, description, thumbnail, homepage, wiki} = char;
-
+const View = (props) => {
+    const {name, description, thumbnail, homepage, wiki} = props.data;
+    const maxLengthDescr = props.maxLengthDescr;
+    console.log(maxLengthDescr)
 
     let descriptionVisible;
     if (description.length < 1) {

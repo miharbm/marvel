@@ -2,7 +2,7 @@ import {useHttp} from "../hooks/http.hook";
 
 const useMarvelService = () => {
 
-    const {loading, request, error, clearError} = useHttp();
+    const {request, clearError, process, setProcess} = useHttp();
     const publicKey = "e074a0a536212d03b82dd93902dbdca7"
     // const privateKey = "271e8f399a298f10445a71563011b2edba4c6c54"
 
@@ -65,9 +65,11 @@ const useMarvelService = () => {
         comics: character.comics.items,
     })
 
-    return {loading, error, clearError,
-        getCharacterById, getAllCharacters,
-        getAllComics, getComicById, getCharacterByName};
+    return {
+        clearError, process, setProcess,
+        getCharacterById, getAllCharacters, getCharacterByName,
+        getAllComics, getComicById
+    };
 }
 
 export default useMarvelService;

@@ -1,16 +1,15 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import useMarvelService from "../../services/MarvelService";
-import ErrorMessage from "../errorMessage/errorMessage";
-import Spinner from "../spinner/Spinner";
 
 import "./singleChar.scss"
 import {Helmet} from "react-helmet";
+import {setContent} from "../../utils/setContent";
 const SingleChar = () => {
     const {charId} = useParams();
     const [char, setChar] = useState(null);
 
-    const {loading, error, getCharacterById, clearError} = useMarvelService();
+    const {process, setProcess, getCharacterById, clearError} = useMarvelService();
 
     const updateChar = () => {
         clearError();
@@ -25,14 +24,10 @@ const SingleChar = () => {
 
     const onCharLoaded = (char) => {
         setChar(char);
+        setProcess("confirmed");
     }
 
-
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !loading && !error && char ? <View char={char}/> : null;
-    const title = !loading && !error && char ? char.name : null;
-
+    const title = process === "confirmed" ? char.name : null;
 
     return (
         <>
@@ -43,17 +38,14 @@ const SingleChar = () => {
                 />
                 <title>{title}</title>
             </Helmet>
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
         </>
     )
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail} = char;
+const View = ({data}) => {
+    const {name, description, thumbnail} = data;
 
-    console.log(char)
     return (
         <div className="single-char">
             <img src={thumbnail} alt={name} className="single-char__img"/>

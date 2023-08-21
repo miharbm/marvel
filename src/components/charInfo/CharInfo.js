@@ -1,13 +1,11 @@
 import './charInfo.scss';
 import React, {useCallback, useEffect, useState} from "react";
-import ErrorMessage from "../errorMessage/errorMessage";
-import Spinner from "../spinner/Spinner";
-import Skeleton from "../skeleton/Skeleton";
 import useMarvelService from "../../services/MarvelService";
 import {Link} from "react-router-dom";
+import {setContent} from "../../utils/setContent";
 
 const CharInfo = (props) => {
-    const {loading, error, getCharacterById, clearError} = useMarvelService();
+    const {getCharacterById, clearError, process, setProcess} = useMarvelService();
 
     const [char, setChar] = useState(null);
     const charId = props.charId;
@@ -19,60 +17,29 @@ const CharInfo = (props) => {
         clearError();
         getCharacterById(charId)
             .then(onCharacterLoaded)
+            .then(() => setProcess("confirmed"))
     }, [charId])
 
-    // const updateChar = useCallback(() => {
-    //     const {charId : id} = props;
-    //     if (!id) {
-    //         return;
-    //     }
-    //     setLoading(true)
-    //     marvelService
-    //         .getCharacterById(id)
-    //         .then(res => onCharacterLoaded(res))
-    //         .catch(onError)
-    //
-    // }, [])
 
     useEffect(() => {
         updateChar();
 
     }, [updateChar]);
 
-    // useEffect(() => {
-    //     updateChar();
-    // }, [charId, updateChar]);
-
-    // componentDidUpdate(prevProps, prevState, snapshot) {
-    //     if (this.props.charId !== prevProps.charId) {
-    //         this.updateChar();
-    //     }
-    // }
-
-
     const onCharacterLoaded = (char) => {
         setChar(char);
     }
 
 
-
-    const skeleton = char || loading || error ? null : <Skeleton/>
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !loading && !error && char ? <View char={char}/> : null;
-
     return (
         <div className="char__info">
-            {errorMessage}
-            {spinner}
-            {content}
-            {skeleton}
+            {setContent(process, View, char)}
         </div>
     )
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki, comics} = char
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki, comics} = data;
     const imgObjectFit = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg"
         ? {objectFit: "contain"} :  null
     return (
